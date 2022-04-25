@@ -200,27 +200,18 @@ abstract public class FSOutputSummer extends OutputStream implements
     return sum;
   }
 
-  protected TraceScope createWriteTraceScope() {
-    return null;
-  }
-
   /** Generate checksums for the given data chunks and output chunks & checksums
    * to the underlying output stream.
    */
   private void writeChecksumChunks(byte b[], int off, int len)
   throws IOException {
     sum.calculateChunkedSums(b, off, len, checksum, 0);
-    TraceScope scope = createWriteTraceScope();
     try {
       for (int i = 0; i < len; i += sum.getBytesPerChecksum()) {
         int chunkLen = Math.min(sum.getBytesPerChecksum(), len - i);
         int ckOffset = i / sum.getBytesPerChecksum() * getChecksumSize();
         writeChunk(b, off + i, chunkLen, checksum, ckOffset,
             getChecksumSize());
-      }
-    } finally {
-      if (scope != null) {
-        scope.close();
       }
     }
   }
